@@ -7,7 +7,7 @@ from _thread import *
 import _ssl
 
 IP = '127.0.0.1' # leave as blank string to listen on all addresses
-PORT = 12346 # port number to bind socket
+PORT = 12344 # port number to bind socket
 TIMER = 10 # Time in seconds
 USER_DATABASE = 'users.csv' # user database
 KEY = Fernet.generate_key()
@@ -22,11 +22,30 @@ def encrypt_message(message, key):
     except Exception as e:
         print(f"Encryption Error: {e}")
 
+def encrypt_data(data, key):
+    try:
+        return Fernet(key).encrypt(data)
+    except Exception as e:
+        print(f"Encryption Error: {e}")
+
 def decrypt_message(message, key):
     try:
         return Fernet(key).decrypt(message.encode()).decode()
     except Exception as e:
         print(f"Decryption Error: {e}")
+        exit()
+
+def send_file(socket, file, key):
+
+    socket.send(encrypt_data(f"{file}:{os.path.getsize(file)}".encode(),key))
+    
+    with open(file, 'rb') as file:
+        while True:
+            bytes_read = file.read(1024)
+            if not bytes_read:
+                break
+            socket.sendall(encrypt_data(bytes_read,KEY))
+    print(f"File push {file} completed!")
 
 def log_message(message, user):
     with open(f"message_logs.txt", 'a') as log_file:
@@ -107,7 +126,6 @@ def validate_login(uname, pswd, online_users):
         return False
     users.close()
 
-
 def broadcast(message, uname, online_users):
     for user in online_users:
         for k, v in user.items():
@@ -126,7 +144,13 @@ def client_thread(con, addr, uname, online_users):
                 
                 if len(online_users) <= 1:
                     con.send(encrypt_message('<server>: No other users connected... Please try again later!',KEY))
-                    
+                    print(message[:4])
+                    if message.split(' ')[0].lower() == "pull":
+                        send_file(con, message.split(' ')[1], KEY)
+                
+                elif message.split(' ')[0].lower() == "pull":
+                    send_file(con, message.split(' ')[1], KEY)
+
                 elif message == "bye":
                     log_event(f"User {uname} disconnected!")
                     con.close()

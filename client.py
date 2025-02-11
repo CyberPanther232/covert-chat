@@ -14,7 +14,42 @@ def decrypt_message(message, key):
     try:
         return Fernet(key).decrypt(message.encode()).decode()
     except Exception as e:
-        print(f"Decryption Error: {e}")
+        print(f"Message Decryption Error: {e}")
+        return
+    
+def decrypt_data(data, key):
+    try:
+        return Fernet(key).decrypt(data)
+    except Exception as e:
+        print(f"Data Decryption Error: {e}")
+        return
+    
+def pull_file(socket, key):
+
+    file_info = decrypt_data(socket.recv(1024), key)
+
+    filepath = file_info.split(":")[0]
+    filesize = file_info.split(":")[1]
+    filename = filepath.split("/")[:-1]
+
+    try:
+        try:
+            open(filename, 'x')
+        except:
+            pass
+        with open(filename, 'wb') as newfile:
+            bytes_received = 0
+            while bytes_received < filesize:
+                chunk = decrypt_data(socket.recv(1024),key)
+                if not chunk:
+                    break
+                newfile.write(chunk)
+                bytes_received += len(chunk)
+            print(f"{filename} pulled succesfully!")
+            return
+    except Exception as e:
+        print(e)
+        return
 
 def getkey(ip):
     try:
@@ -68,20 +103,25 @@ def main():
                     while True:
                         msg = str(input("\nEnter Message: "))
                         sock.send(encrypt_message(msg, key))
-                        reply = decrypt_message(sock.recv(2048).decode(), key)
-                        if reply:
-                            print(reply)
-                            
-                        elif reply == "Secure Channel Setup":
-                            pass
+                        print(msg[0:4])
+                        if msg[0:4].lower() == "pull":
+                            pull_file(sock, key)
                         else:
-                            pass
+                            reply = decrypt_message(sock.recv(2048).decode(), key)
+                            if reply:
+                                print(reply)
+                                
+                            elif reply == "Secure Channel Setup":
+                                pass
+                            else:
+                                pass
                 else:
                     sock.close()
                     
             except Exception as e:
                 print(f"Connection Error: {e}")
-                return None
+                pass
+                # return None
 
         except Exception as e:
             print(f"Error: {e}")
