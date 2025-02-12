@@ -1,8 +1,9 @@
 import socket
 import hashlib
 import os
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet # type: ignore
 from datetime import datetime
+from random import randint
 from _thread import *
 import _ssl
 
@@ -13,9 +14,27 @@ USER_DATABASE = 'users.csv' # user database
 KEY = Fernet.generate_key()
 CHUNK_SIZE = 4096
 
-class Secure_Channel:
-    def __init__(self, user1, user2):
-        self.user1, self.user2 = user1, user2
+class TransferTunnel:
+    def __init__(self, user1, user2, command, ip, port=randint(60000,65535), file="none"):
+        self.user1, self.user2, self.ip, self.port, self.command, self.file = user1, user2, ip, port, command, file
+
+    def establish_connection(self):
+        self.tsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.tsock.bind(self.ip, self.port)
+
+        self.tsock.listen(10)
+        conn, addr = self.tsock.accept()
+        print("Connection established!")
+        conn.send(encrypt_message("Connection established!"),KEY)
+
+    def send_data(self):
+        try:
+            with open(self.file, 'rb') as readfile:
+                while chunk := readfile.read(CHUNK_SIZE):
+                    self.tsock.sendall(encrypt_data(chunk, KEY))
+        except FileNotFoundError:
+            print(f"Error: {self.file} not found!")
+            socket.send(encrypt_message("Error: File not found", KEY))
 
 def encrypt_message(message, key):
     try:
@@ -28,6 +47,13 @@ def encrypt_data(data, key):
         return Fernet(key).encrypt(data)
     except Exception as e:
         print(f"Encryption Error: {e}")
+
+def decrypt_data(data, key):
+    try:
+        return Fernet(key).decrypt(data)
+    except Exception as e:
+        print(f"Data Decryption Error: {e}")
+        return
 
 def decrypt_message(message, key):
     try:
@@ -52,7 +78,7 @@ def log_message(message, user):
 
 def keygen():
     try:
-        open('keyfile.key', 'wb').write(KEY)
+        open('./keyfile.key', 'wb').write(KEY)
     except Exception as e:
         print(f"Encryption key generation error: {e}")
         return None
@@ -129,39 +155,56 @@ def broadcast(message, uname, online_users):
             else:
                 v.send(encrypt_message(message, KEY))
 
+def save_chat(chat_data, uname, message):
+
+
 def client_thread(con, addr, uname, online_users):
     while True:
         try:
-            message = decrypt_message(con.recv(CHUNK_SIZE).decode(), KEY)
-            print(message)
-            if message:
-                print("<" + uname + ">: " + message)
-                message_to_send = "<" + uname + ">: " + message
-                
-                if message.split(' ')[0].lower() == "pull":
-                        try:
-                            send_file(con, message.split(' ')[1], KEY)
-                        except Exception as e:
-                            print('Invalid pull command...')
-                            pass
-                
-                if len(online_users) <= 1:
-                    con.send(encrypt_message('<server>: No other users connected... Please try again later!',KEY))
-                
-               elif message.lower() == "bye":
-                    log_event(f"User {uname} disconnected!")
-                    online_users = [user for user in online_users if uname not in user]
-                    con.close()
-                    return
+            enc_message = con.recv(CHUNK_SIZE)
 
+            if not enc_message:
+                print("Client response error...")
+                online_users.remove({uname : con})
+                con.close()
+                return
+
+            message = decrypt_message(enc_message, KEY)
+            if message:
+
+                if message.lower() == "waiting...":
+                    con.send(encrypt_message("", KEY))
                 else:
-                    log_message(message, uname)
-                    broadcast(message_to_send, uname, online_users)
+                    print("<" + uname + ">: " + message)
+                    message_to_send = "<" + uname + ">: " + message
+                    
+                    if message.split(' ')[0].lower() == "pull":
+                            try:
+                                send_file(con, message.split(' ')[1], KEY)
+                            except Exception as e:
+                                print('Invalid pull command...')
+                                pass
+                    
+                    # if len(online_users) <= 1:
+                    #     con.send(encrypt_message('<server>: No other users connected... Please try again later!',KEY))
+                    
+                    elif message.lower() == "bye":
+                        log_event(f"User {uname} disconnected!")
+                        print(f"{uname} has disconnected!")
+                        con.close()
+                        online_users.remove({uname : con})
+                        break
+
+
+                    else:
+                        log_message(message, uname)
+                        con.send(encrypt_message("Message received!", KEY))
+                        broadcast(message_to_send, uname, online_users)
 
         except Exception as e:
             print(f"Exception: {e}")
             continue
-
+    return 
 def format_date(date):
     return datetime.strftime(date, '%m/%d/%y %H:%M:%S.%f')
 
@@ -171,11 +214,15 @@ def log_event(event):
 
 def main():
 
+    global chat_data
+    chat_data = {}
+
     print("Starting up covert PypherText messaging...")
     print("Running user setup...")
     generate_user_database()
     print("Generating new keyfile...")
     keygen()
+    print("Generated Key")
 
     try:
 
@@ -210,8 +257,8 @@ def main():
                 con.send(encrypt_message('Please enter your login credentials', KEY))
 
                 try:
-                    uname = decrypt_message(con.recv(CHUNK_SIZE).decode(), KEY)
-                    pswd = hashlib.sha512(decrypt_message(con.recv(CHUNK_SIZE).decode(), KEY).encode()).hexdigest()
+                    uname = decrypt_message(con.recv(CHUNK_SIZE), KEY)
+                    pswd = hashlib.sha512(decrypt_data(con.recv(CHUNK_SIZE), KEY)).hexdigest()
                     
                     if validate_login(uname, pswd, online_users):
 
@@ -220,8 +267,14 @@ def main():
                         log_event(f"Login Successful from {uname}")
 
                         online_users.append({uname : con})
-                        
-                        start_new_thread(client_thread, (con, addr, uname, online_users))
+                        chat_data[uname] = []
+
+                        try:
+                            start_new_thread(client_thread, (con, addr, uname, online_users))
+                        except Exception as e:
+                            print(f"Error: {e}")
+                            online_users.remove({uname : con})
+                            con.close()
 
                     else:
                         con.send(encrypt_message('Login unsuccessful... Closing connection!', KEY))
@@ -231,8 +284,11 @@ def main():
 
                 except Exception as e:
                     print(e)
+                    con.close()
+                    continue
             except Exception as e:
                 print(f"Socket Error: {e}")
+                continue
 
     except Exception as e:
         print(f"Error: {e}")

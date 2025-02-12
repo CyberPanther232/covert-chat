@@ -14,3 +14,127 @@
 <testuser>: pull sneaky_snake.jpg - 02/11/25 19:36:58.267484
 <testuser>: pull sneaky_snake.jpg - 02/11/25 19:39:39.256550
 <testuser>: HellO! - 02/11/25 19:39:39.263323
+<testuser>: Hello! - 02/12/25 09:08:26.730579
+<testuser>: Hello! - 02/12/25 09:15:41.806427
+<testuser>: Hello! - 02/12/25 09:56:43.892596
+<testuser>: Hello! - 02/12/25 09:57:48.172504
+<testuser>: hello! - 02/12/25 09:59:01.748557
+<testuser>: hello! - 02/12/25 10:04:01.789176
+<testuser>: Hello! - 02/12/25 10:08:26.430155
+<testuser>: Hello! - 02/12/25 10:09:21.830122
+<testuser>: HellO! - 02/12/25 10:29:25.128317
+<testuser>: How are you? - 02/12/25 10:29:31.488648
+<testuser>: Hello! - 02/12/25 10:30:39.232745
+<testuser>: Hello! - 02/12/25 10:49:40.274883
+<testuser>: How are you? - 02/12/25 10:49:42.762894
+<testuser>: Hello! - 02/12/25 10:51:31.506910
+<testuser>: Hello! - 02/12/25 14:55:50.680491
+<testuser>: How are you? - 02/12/25 14:55:54.120650
+<testuser>: I am glad this part is working now! - 02/12/25 14:56:52.368704
+<testuser2>: Hello! - 02/12/25 14:57:12.576641
+<testuser>: Hey - 02/12/25 14:57:28.432619
+<testuser2>: Hello! - 02/12/25 14:57:42.328674
+<testuser2>: How are you? - 02/12/25 14:57:47.969095
+<testuser2>: Hello! - 02/12/25 15:00:19.489182
+<testuser>: HellO! - 02/12/25 15:00:26.241412
+<testuser2>: Hello! - 02/12/25 15:03:44.239553
+<testuser>: Hello! - 02/12/25 15:03:56.961751
+<testuser>: Hello! - 02/12/25 15:04:54.369891
+<testuser2>: Hello! - 02/12/25 15:05:05.271199
+<testuser2>: How are you? - 02/12/25 15:05:11.714346
+<testuser>: I am good how are you? - 02/12/25 15:05:23.383000
+<testuser>: Hello! - 02/12/25 15:07:24.674753
+<testuser2>: Hello! - 02/12/25 15:07:39.641160
+<testuser>: Hello! - 02/12/25 15:10:09.461999
+<testuser2>: Hello! - 02/12/25 15:10:48.523248
+<testuser>: Hello! - 02/12/25 15:13:35.443903
+<testuser2>: Hello! - 02/12/25 15:13:42.899578
+<testuser>: Hello! - 02/12/25 15:15:33.123623
+<testuser2>: Hey - 02/12/25 15:15:43.852245
+<testuser2>: I am good - 02/12/25 15:15:48.235989
+<testuser>: Hello! - 02/12/25 15:17:03.444417
+<testuser2>: Hello! - 02/12/25 15:17:09.564099
+<testuser>: Waiting... - 02/12/25 15:19:05.537411
+<testuser>: Waiting... - 02/12/25 15:19:11.084839
+<testuser>: Waiting... - 02/12/25 15:19:11.956904
+<testuser2>: Hello! - 02/12/25 15:19:18.428517
+<testuser2>: How are you doing? - 02/12/25 15:19:26.052614
+<testuser>: Waiting... - 02/12/25 15:19:33.149762
+<testuser>: Waiting... - 02/12/25 15:19:37.173095
+<testuser2>: Waiting... - 02/12/25 15:19:40.773169
+<testuser2>: Waiting... - 02/12/25 15:19:43.245063
+<testuser2>: Waiting... - 02/12/25 15:20:27.101021
+<testuser2>: Waiting... - 02/12/25 15:20:27.348764
+<testuser2>: Waiting... - 02/12/25 15:20:27.725234
+<testuser2>: Waiting... - 02/12/25 15:20:27.909000
+<testuser2>: Waiting... - 02/12/25 15:20:28.409175
+<testuser2>: Waiting... - 02/12/25 15:20:28.438557
+<testuser2>: Waiting... - 02/12/25 15:20:28.469694
+<testuser2>: Waiting... - 02/12/25 15:20:28.498853
+<testuser2>: Waiting... - 02/12/25 15:20:28.529153
+<testuser2>: Waiting... - 02/12/25 15:20:28.565525
+<testuser2>: Waiting... - 02/12/25 15:20:28.596593
+<testuser2>: Waiting... - 02/12/25 15:20:28.621849
+<testuser2>: Waiting... - 02/12/25 15:20:28.662551
+<testuser2>: Waiting... - 02/12/25 15:20:28.688017
+<testuser2>: Waiting... - 02/12/25 15:20:28.714284
+<testuser2>: Waiting... - 02/12/25 15:20:28.744576
+<testuser2>: Waiting... - 02/12/25 15:20:28.953916
+<testuser>: Waiting... - 02/12/25 15:20:56.668481
+<testuser>: Hello! - 02/12/25 15:22:21.484868
+<testuser2>: Hello! - 02/12/25 15:22:25.593887
+<testuser>: Hello! - 02/12/25 15:23:48.173497
+<testuser>: Hello! - 02/12/25 15:24:41.789491
+<testuser2>: Hello! - 02/12/25 15:25:02.933339
+<testuser>: Hello! - 02/12/25 15:25:48.507241
+<testuser2>: Hello! - 02/12/25 15:26:10.005490
+<testuser>: Hey! - 02/12/25 15:26:18.717469
+<testuser2>: How are you? - 02/12/25 15:26:45.133778
+<testuser2>: Hello! - 02/12/25 15:27:45.061611
+<testuser>: Hello! - 02/12/25 15:28:15.213632
+<testuser2>: Hello! - 02/12/25 15:28:40.838121
+<testuser>: Hello! - 02/12/25 15:28:52.326121
+<testuser2>: Hey! - 02/12/25 15:28:59.702064
+<testuser>: Hey - 02/12/25 15:29:19.133961
+<testuser2>: Hello! - 02/12/25 15:29:27.590151
+<testuser2>: HEH - 02/12/25 15:29:31.334197
+<testuser2>: heh - 02/12/25 15:29:31.770988
+<testuser2>: eh - 02/12/25 15:29:32.061793
+<testuser2>: eh - 02/12/25 15:29:32.301883
+<testuser2>: e - 02/12/25 15:29:32.509907
+<testuser2>: he - 02/12/25 15:29:32.701650
+<testuser2>: he - 02/12/25 15:29:32.942231
+<testuser2>: he - 02/12/25 15:29:33.149490
+<testuser2>: he - 02/12/25 15:29:33.373819
+<testuser2>: h - 02/12/25 15:29:33.598852
+<testuser2>: eh - 02/12/25 15:29:33.805935
+<testuser2>: eh - 02/12/25 15:29:34.045626
+<testuser2>: eh - 02/12/25 15:29:34.245650
+<testuser2>: e - 02/12/25 15:29:34.477891
+<testuser2>: he - 02/12/25 15:29:34.685979
+<testuser2>: he - 02/12/25 15:29:34.932123
+<testuser2>: h - 02/12/25 15:29:35.181715
+<testuser2>: eh - 02/12/25 15:29:35.381453
+<testuser2>: eh - 02/12/25 15:29:35.603855
+<testuser2>: e - 02/12/25 15:29:35.805713
+<testuser2>: he - 02/12/25 15:29:36.042032
+<testuser2>: h - 02/12/25 15:29:36.253949
+<testuser2>: eh - 02/12/25 15:29:36.485649
+<testuser2>: e - 02/12/25 15:29:36.709728
+<testuser2>: he - 02/12/25 15:29:36.933906
+<testuser2>: he - 02/12/25 15:29:37.149625
+<testuser2>: he - 02/12/25 15:29:37.364073
+<testuser2>: h - 02/12/25 15:29:37.597902
+<testuser2>: eh - 02/12/25 15:29:37.829951
+<testuser2>: e - 02/12/25 15:29:38.069717
+<testuser2>: he - 02/12/25 15:29:38.317620
+<testuser2>: h - 02/12/25 15:29:38.533954
+<testuser2>: eh - 02/12/25 15:29:38.749984
+<testuser2>: e - 02/12/25 15:29:38.974027
+<testuser2>: he - 02/12/25 15:29:39.245485
+<testuser2>: h - 02/12/25 15:29:39.461771
+<testuser2>: e - 02/12/25 15:29:39.670122
+<testuser2>: he - 02/12/25 15:29:39.877898
+<testuser2>: clear - 02/12/25 15:29:41.692585
+<testuser>: Hello! - 02/12/25 15:29:48.269869
+<testuser>: Hey - 02/12/25 15:29:55.317930
