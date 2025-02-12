@@ -52,8 +52,8 @@ def pull_file(s, key):
         
 def getkey(ip):
     try:
-        response = requests.get(f"http://{ip}:8000/keyfile.key", timeout=5)
-        response.raise_for_status()
+        # response = requests.get(f"http://{ip}:8000/keyfile.key", timeout=5)
+        # response.raise_for_status()
         with open("keyfile.key", "wb") as f:
             f.write(response.content)
         return response.content
@@ -109,7 +109,6 @@ def main():
                         if msg[0:4].lower() == "pull":
                             pull_file(sock, key)
                         else:
-                            sock.send(encrypt_message(msg, key))
                             reply = decrypt_message(sock.recv(CHUNK_SIZE).decode(), key)
                             if reply:
                                 print(reply)
@@ -128,7 +127,7 @@ def main():
 
         except Exception as e:
             print(f"Error: {e}")
-            next
+            continue
 
 if __name__ == "__main__":
     try:

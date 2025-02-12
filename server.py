@@ -11,6 +11,7 @@ PORT = 12345 # port number to bind socket
 TIMER = 10 # Time in seconds
 USER_DATABASE = 'users.csv' # user database
 KEY = Fernet.generate_key()
+CHUNK_SIZE = 4096
 
 class Secure_Channel:
     def __init__(self, user1, user2):
@@ -30,26 +31,24 @@ def encrypt_data(data, key):
 
 def decrypt_message(message, key):
     try:
-        return Fernet(key).decrypt(message.encode()).decode()
+        return Fernet(key).decrypt(message).decode()
     except Exception as e:
         print(f"Decryption Error: {e}")
-        exit()
+        return None  # Avoid exit, just return None
 
 def send_file(socket, file, key):
-    socket.send(encrypt_data(f"{file}:{os.path.getsize(file)}".encode(),key))
-    
-    with open(file, 'rb') as readfile:
-        while True:
-            bytes_read = readfile.read(1024)
-            if not bytes_read:
-                break
-            socket.sendall(encrypt_data(bytes_read,KEY))
-    print(f"File push {file} completed!")
+    try:
+        with open(file, 'rb') as readfile:
+            while chunk := readfile.read(CHUNK_SIZE):
+                socket.sendall(encrypt_data(chunk, key))
+    except FileNotFoundError:
+        print(f"Error: {file} not found!")
+        socket.send(encrypt_message("Error: File not found", key))
+
 
 def log_message(message, user):
     with open(f"message_logs.txt", 'a') as log_file:
         log_file.write(f"<{user}>: {message} - {format_date(datetime.now())}\n")
-    log_file.close()
 
 def keygen():
     try:
@@ -70,7 +69,6 @@ def check_for_user(uname):
                 user_exists = True
             else:
                 pass
-    users.close()
 
     return user_exists
 
@@ -95,7 +93,6 @@ def generate_user_database():
             else:
                 with open(USER_DATABASE, 'a') as users:
                     users.write(f"{uname},{hashlib.sha512(pswd.encode()).hexdigest()}\n")
-                users.close()
 
                 print("User created successfully!")
                 prompt = str(input("Would you like to add another?")).lower()
@@ -111,11 +108,10 @@ def validate_login(uname, pswd, online_users):
         for line in users:
             stored_uname, stored_hash = line.strip().split(',')
             if uname == stored_uname and pswd == stored_hash:
-                for user in online_users:
-                    for k,v in user.items():
-                        if uname == k:
-                            print("Error... Login unsuccessful") # Covertly handles when users are already signed in
-    
+                online_users_dict = {user: con for d in online_users for user, con in d.items()}
+                if uname in online_users_dict:
+                    print("Error... Login unsuccessful")
+
                 print(f"Login from user {uname} successful!")
                 return True
             else:
@@ -136,7 +132,7 @@ def broadcast(message, uname, online_users):
 def client_thread(con, addr, uname, online_users):
     while True:
         try:
-            message = decrypt_message(con.recv(2048).decode(), KEY)
+            message = decrypt_message(con.recv(CHUNK_SIZE).decode(), KEY)
             print(message)
             if message:
                 print("<" + uname + ">: " + message)
@@ -144,7 +140,6 @@ def client_thread(con, addr, uname, online_users):
                 
                 if message.split(' ')[0].lower() == "pull":
                         try:
-                            print(message.split(' ')[1].lower())
                             send_file(con, message.split(' ')[1], KEY)
                         except Exception as e:
                             print('Invalid pull command...')
@@ -153,9 +148,12 @@ def client_thread(con, addr, uname, online_users):
                 if len(online_users) <= 1:
                     con.send(encrypt_message('<server>: No other users connected... Please try again later!',KEY))
                 
-                elif message == "bye":
+               elif message.lower() == "bye":
                     log_event(f"User {uname} disconnected!")
+                    online_users = [user for user in online_users if uname not in user]
                     con.close()
+                    return
+
                 else:
                     log_message(message, uname)
                     broadcast(message_to_send, uname, online_users)
@@ -170,7 +168,6 @@ def format_date(date):
 def log_event(event):
     with open('log', 'a') as logfile:
         logfile.write(f'{event}' + ": " + f'{format_date(datetime.now())}\n')
-    logfile.close()
 
 def main():
 
@@ -189,7 +186,6 @@ def main():
 
         with open('log', 'a') as logfile:
             logfile.write(f"Server started: {format_date(datetime.now())}")
-        logfile.close()
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -214,8 +210,8 @@ def main():
                 con.send(encrypt_message('Please enter your login credentials', KEY))
 
                 try:
-                    uname = decrypt_message(con.recv(1024).decode(), KEY)
-                    pswd = hashlib.sha512(decrypt_message(con.recv(1024).decode(), KEY).encode()).hexdigest()
+                    uname = decrypt_message(con.recv(CHUNK_SIZE).decode(), KEY)
+                    pswd = hashlib.sha512(decrypt_message(con.recv(CHUNK_SIZE).decode(), KEY).encode()).hexdigest()
                     
                     if validate_login(uname, pswd, online_users):
 
@@ -227,13 +223,11 @@ def main():
                         
                         start_new_thread(client_thread, (con, addr, uname, online_users))
 
-
                     else:
                         con.send(encrypt_message('Login unsuccessful... Closing connection!', KEY))
                         log_event(f"Login attempt unsuccessful!")
                         con.shutdown(socket.SHUT_WR)
                         con.close()
-                    
 
                 except Exception as e:
                     print(e)
