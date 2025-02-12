@@ -3,6 +3,9 @@ from cryptography.fernet import Fernet
 import _ssl
 import os
 import time
+import requests
+
+CHUNK_SIZE = 4096
 
 def encrypt_message(message, key):
     try:
@@ -24,41 +27,41 @@ def decrypt_data(data, key):
         print(f"Data Decryption Error: {e}")
         return
     
-def pull_file(socket, key):
-
-    file_info = decrypt_data(socket.recv(1024), key)
-
-    filepath = file_info.split(":")[0]
-    filesize = file_info.split(":")[1]
-    filename = filepath.split("/")[:-1]
+def pull_file(s, key):
+    file_info = decrypt_data(s.recv(CHUNK_SIZE), key).decode()
+    try:
+        filepath, filesize = file_info.split(":")
+        filename = os.path.basename(filepath)
+        filesize = int(filesize)
+    except ValueError:
+        print("Invalid file info format!")
+        return
 
     try:
-        try:
-            open(filename, 'x')
-        except:
-            pass
         with open(filename, 'wb') as newfile:
             bytes_received = 0
             while bytes_received < filesize:
-                chunk = decrypt_data(socket.recv(1024),key)
+                chunk = decrypt_data(s.recv(CHUNK_SIZE), key)
                 if not chunk:
                     break
                 newfile.write(chunk)
                 bytes_received += len(chunk)
-            print(f"{filename} pulled succesfully!")
-            return
+        print(f"{filename} pulled successfully!")
     except Exception as e:
-        print(e)
-        return
-
+        print(f"File Transfer Error: {e}")
+        
 def getkey(ip):
     try:
-        os.system(f"curl -s -O http://{ip}:8000/keyfile.key")
-        return open('keyfile.key', 'rb').read()
+        response = requests.get(f"http://{ip}:8000/keyfile.key", timeout=5)
+        response.raise_for_status()
+        with open("keyfile.key", "wb") as f:
+            f.write(response.content)
+        return response.content
     except Exception as e:
         print(f"Key file error: {e}")
         time.sleep(5)
         return None
+
 
 def main():
 
@@ -90,12 +93,12 @@ def main():
 
             try:
                 sock.connect((ip, port))
-                print(decrypt_message(sock.recv(1024).decode(), key))
+                print(decrypt_message(sock.recv(CHUNK_SIZE).decode(), key))
                 uname = str(input("Enter username: "))
                 sock.send(encrypt_message(uname, key))
                 pswd = str(input("Enter password: "))
                 sock.send(encrypt_message(pswd, key))
-                login_reply = decrypt_message(sock.recv(1024).decode(), key)
+                login_reply = decrypt_message(sock.recv(CHUNK_SIZE).decode(), key)
                 
                 print(login_reply)
                 
@@ -103,11 +106,11 @@ def main():
                     while True:
                         msg = str(input("\nEnter Message: "))
                         sock.send(encrypt_message(msg, key))
-                        print(msg[0:4])
                         if msg[0:4].lower() == "pull":
                             pull_file(sock, key)
                         else:
-                            reply = decrypt_message(sock.recv(2048).decode(), key)
+                            sock.send(encrypt_message(msg, key))
+                            reply = decrypt_message(sock.recv(CHUNK_SIZE).decode(), key)
                             if reply:
                                 print(reply)
                                 

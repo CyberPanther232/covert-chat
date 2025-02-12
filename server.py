@@ -7,7 +7,7 @@ from _thread import *
 import _ssl
 
 IP = '127.0.0.1' # leave as blank string to listen on all addresses
-PORT = 12344 # port number to bind socket
+PORT = 12345 # port number to bind socket
 TIMER = 10 # Time in seconds
 USER_DATABASE = 'users.csv' # user database
 KEY = Fernet.generate_key()
@@ -36,12 +36,11 @@ def decrypt_message(message, key):
         exit()
 
 def send_file(socket, file, key):
-
     socket.send(encrypt_data(f"{file}:{os.path.getsize(file)}".encode(),key))
     
-    with open(file, 'rb') as file:
+    with open(file, 'rb') as readfile:
         while True:
-            bytes_read = file.read(1024)
+            bytes_read = readfile.read(1024)
             if not bytes_read:
                 break
             socket.sendall(encrypt_data(bytes_read,KEY))
@@ -138,19 +137,22 @@ def client_thread(con, addr, uname, online_users):
     while True:
         try:
             message = decrypt_message(con.recv(2048).decode(), KEY)
+            print(message)
             if message:
                 print("<" + uname + ">: " + message)
                 message_to_send = "<" + uname + ">: " + message
                 
+                if message.split(' ')[0].lower() == "pull":
+                        try:
+                            print(message.split(' ')[1].lower())
+                            send_file(con, message.split(' ')[1], KEY)
+                        except Exception as e:
+                            print('Invalid pull command...')
+                            pass
+                
                 if len(online_users) <= 1:
                     con.send(encrypt_message('<server>: No other users connected... Please try again later!',KEY))
-                    print(message[:4])
-                    if message.split(' ')[0].lower() == "pull":
-                        send_file(con, message.split(' ')[1], KEY)
                 
-                elif message.split(' ')[0].lower() == "pull":
-                    send_file(con, message.split(' ')[1], KEY)
-
                 elif message == "bye":
                     log_event(f"User {uname} disconnected!")
                     con.close()

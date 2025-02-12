@@ -1,11 +1,10 @@
 from cryptography.fernet import Fernet
 
-key = Fernet.generate_key()
+file_info = "files/test.txt:1200"
+filepath = file_info.split(":")[0]
+filesize = int(file_info.split(":")[1])
+filename = filepath.split("/")[::-1][0]
 
-print(key)
-
-open('keyfile.key', 'wb').write(key)
-
-message = 'Hello World!'
-
-print(Fernet(key).encrypt(message.encode('utf-8')))
+print(filepath)
+print(filesize)
+print(filename)
