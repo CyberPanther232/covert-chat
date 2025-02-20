@@ -193,13 +193,7 @@ def main():
                                     else:
                                         pass
                             else:
-                                print("\nWaiting for response...\n")
-                                try:
-                                    print(decrypt_data(sock.recv(CHUNK_SIZE), key).decode())
-                                except Exception as e:
-                                    print("No response detected...")
-                                    pass
-                            
+                                print("No message sent...")
                     else:
                         sock.close()
                     

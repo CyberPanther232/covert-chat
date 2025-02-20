@@ -8,7 +8,7 @@ from _thread import *
 import _ssl
 
 IP = '127.0.0.1' # leave as blank string to listen on all addresses
-PORT = 12345 # port number to bind socket
+PORT = 12346 # port number to bind socket
 TIMER = 10 # Time in seconds
 USER_DATABASE = 'users.csv' # user database
 KEY = Fernet.generate_key()
@@ -190,6 +190,7 @@ def client_thread(con, addr, uname, online_users):
                     print(f"{uname} has disconnected!")
                     con.close()
                     online_users.remove({uname : con})
+                    broadcast(f"User {uname} has logged off.",uname, online_users)
                     break
 
 
